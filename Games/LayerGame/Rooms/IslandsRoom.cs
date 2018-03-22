@@ -68,29 +68,28 @@ namespace LayerGame
             _roomBounds = new RectangleF(-rx, 0, rx * 3, 800f);
             _room.RoomLimitsProvider = AGSRoomLimits.Custom(_roomBounds);
 
-            Point islandPos = new Point(rx / 2, ry / 4);
-
+            Point islandPos = new Point(0, 0);
             // Creating world spaces (a number of islands on different layers of parallax)
-            _wsystem = new WorldSystem();
+            _wsystem = new WorldSystem("ws", _game);
+            _wsystem.Baseline = ry / 4;
             _wsystem.ParallaxPerDistance = new PointF(1.4f, 1.1f);
             _wsystem.ScalePerDistance = new PointF(0.1f, 0.1f);
             _wsystem.PerspectiveShiftPerDistance = new PointF(0f, 15f);
-            _wsystem.ShadePerDistance = 30f;
             int wz = AGSLayers.Foreground.Z;
-            _spaceIsland1 = new WorldSpace(_wsystem, 0f, wz);
+            _spaceIsland1 = new WorldSpace("island1", _wsystem, 0f, wz);
             IObject island = await addIsland("island1", "island_plat1.png", islandPos.X, islandPos.Y);
             _spaceIsland1.Attach(island);
-            _spaceIsland2 = new WorldSpace(_wsystem, 2f, wz + 1);
+            _spaceIsland2 = new WorldSpace("island2", _wsystem, 4f, wz + 1);
             island = await addIsland("island2", "island_plat2.png", islandPos.X, islandPos.Y);
             _spaceIsland2.Attach(island);
-            _spaceIsland3 = new WorldSpace(_wsystem, 4f, wz + 2);
+            _spaceIsland3 = new WorldSpace("island3", _wsystem, 8f, wz + 2);
             island = await addIsland("island3", "island_plat3.png", islandPos.X, islandPos.Y);
             _spaceIsland3.Attach(island);
             _wsystem.Spaces.Add(_spaceIsland1);
             _wsystem.Spaces.Add(_spaceIsland2);
             _wsystem.Spaces.Add(_spaceIsland3);
 
-            _islandWalklines = new float[3] { 122f, 79f, 175f };
+            _islandWalklines = new float[3] { -34f, -24f, -18f };
 
             _robot = await addObject("robot", "robot.png");
             jumpToIsland(_robot, 0);
