@@ -26,6 +26,7 @@ namespace LayerGame
             game.State.RoomTransitions.Transition = AGSRoomTransitions.Instant();
 
             Assets.Rooms.PrecreateAll(game);
+            Assets.RoomSwitcher.Init(game);
         }
     }
 }

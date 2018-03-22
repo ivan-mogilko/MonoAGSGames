@@ -11,7 +11,11 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Assets.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameStarter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rooms\IslandsRoom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rooms\ParallaxRoom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rooms\RoomScript.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\MathEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WorldSpace.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WorldSystem.cs" />
   </ItemGroup>
 </Project>

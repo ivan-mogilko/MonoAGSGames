@@ -3,6 +3,7 @@ using AGS.API;
 
 namespace LayerGame
 {
+    // TODO: move the class to shared library
     public abstract class RoomScript
     {
         protected readonly IGame _game;
@@ -25,6 +26,8 @@ namespace LayerGame
 
             _room = await loadAsync();
             _game.State.Rooms.Add(_room);
+            _room.Events.OnBeforeFadeIn.Subscribe(onActivate);
+            _room.Events.OnAfterFadeOut.Subscribe(onDeactivate);
             return _room;
         }
 
@@ -35,6 +38,8 @@ namespace LayerGame
         }
 
         protected virtual async Task<IRoom> loadAsync() { return null; }
+        protected virtual void onActivate() { }
+        protected virtual void onDeactivate() { }
 
         protected IObject getObject(string name, IImage image, int x = 0, int y = 0)
         {

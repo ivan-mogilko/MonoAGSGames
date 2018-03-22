@@ -57,31 +57,42 @@ namespace LayerGame
                 o.RenderLayer = _foregroundLayers[l];
             }
 
-            _roomBounds = new RectangleF(foreground.X, foreground.Y, foreground.Width, 400f - foreground.Y);
+            int ry = _game.Settings.VirtualResolution.Height;
+            _roomBounds = new RectangleF(foreground.X, foreground.Y, foreground.Width, ry - foreground.Y);
             _room.RoomLimitsProvider = AGSRoomLimits.Custom(_roomBounds);
-
-            _game.Events.OnRepeatedlyExecute.Subscribe(onRepExec);
-
             return _room;
+        }
+
+        protected override void onActivate()
+        {
+            _game.Events.OnRepeatedlyExecute.Subscribe(onRepExec);
+        }
+
+        protected override void onDeactivate()
+        {
+            _game.Events.OnRepeatedlyExecute.Unsubscribe(onRepExec);
         }
 
         private void onRepExec(IRepeatedlyExecuteEventArgs args)
         {
+            // TODO: move to shared code
             var input = _game.Input;
             var view = _game.State.Viewport;
             int rx = _game.Settings.VirtualResolution.Width;
             int ry = _game.Settings.VirtualResolution.Height;
             float viewspeed = 100f * (float)args.DeltaTime;
+            float x = view.X;
+            float y = view.Y;
             if (input.IsKeyDown(Key.Left))
-                view.X -= viewspeed;
+                x -= viewspeed;
             if (input.IsKeyDown(Key.Right))
-                view.X += viewspeed;
+                x += viewspeed;
             if (input.IsKeyDown(Key.Up))
-                view.Y += viewspeed;
+                y += viewspeed;
             if (input.IsKeyDown(Key.Down))
-                view.Y -= viewspeed;
-            view.X = MathUtils.Clamp(view.X, _roomBounds.X, _roomBounds.X + _roomBounds.Width - rx);
-            view.Y = MathUtils.Clamp(view.Y, _roomBounds.Y, _roomBounds.Y + _roomBounds.Height - ry);
+                y -= viewspeed;
+            view.X = MathUtils.Clamp(x, _roomBounds.X, _roomBounds.X + _roomBounds.Width - rx);
+            view.Y = MathUtils.Clamp(y, _roomBounds.Y, _roomBounds.Y + _roomBounds.Height - ry);
         }
     }
 }

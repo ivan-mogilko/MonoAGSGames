@@ -49,12 +49,38 @@ namespace LayerGame
         {
             public static List<RoomScript> AllRooms = new List<RoomScript>();
             public static ParallaxRoom ParallaxRoom;
+            public static IslandsRoom IslandsRoom;
 
             public static void PrecreateAll(IGame game)
             {
                 ParallaxRoom = new ParallaxRoom(game);
+                IslandsRoom = new IslandsRoom(game);
 
                 AllRooms.Add(ParallaxRoom);
+                AllRooms.Add(IslandsRoom);
+            }
+        }
+
+        public static class RoomSwitcher
+        {
+            private static IInput _input;
+
+            public static void Init(IGame game)
+            {
+                _input = game.Input;
+                _input.KeyDown.Subscribe(onKeyDown);
+            }
+
+            private static async void onKeyDown(KeyboardEventArgs args)
+            {
+                Key key = args.Key;
+                if (_input.IsKeyDown(Key.LControl) &&
+                    key >= Key.Number1 && key <= Key.Number9)
+                {
+                    int num = key - Key.Number1;
+                    if (num < Rooms.AllRooms.Count)
+                        await Rooms.AllRooms[num].GotoAsync();
+                }
             }
         }
     }
