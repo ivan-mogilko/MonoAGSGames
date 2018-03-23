@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using AGS.API;
 using AGS.Engine;
 
@@ -10,7 +10,8 @@ namespace LayerGame
         private readonly WorldSystem _system;
         private readonly float _distance;
         private readonly IRenderLayer _renderLayer;
-        private IConcurrentHashSet<IObject> _objects = new AGSConcurrentHashSet<IObject>();
+        private AGSConcurrentHashSet<IObject> _objects = new AGSConcurrentHashSet<IObject>();
+        private List<IArea> _areas = new List<IArea>();
         private readonly IObject _parent;
 
         public string ID { get => _id; }
@@ -20,7 +21,10 @@ namespace LayerGame
         public int Z { get => _renderLayer.Z; }
         public float Distance { get => _distance; }
 
-        public IConcurrentHashSet<IObject> Objects { get => _objects; }
+        public PointF ScaleFactor { get; }
+
+        public IEnumerable<IObject> Objects { get => _objects; }
+        public IReadOnlyList<IArea> Areas { get => _areas; }
 
         public WorldSpace(string id, WorldSystem system, float distance, int z)
         {
@@ -37,8 +41,10 @@ namespace LayerGame
             _parent.X = _system.Game.Settings.VirtualResolution.Width / 2 * -(parallax.X - 1f) + _system.PerspectiveShiftPerDistance.X * _distance;
             _parent.Y = _system.Baseline + _system.PerspectiveShiftPerDistance.Y * _distance;
             _parent.BaseSize = new SizeF(1f, 1f);
-            _parent.ScaleX = 1f - _system.ScalePerDistance.X * _distance;
-            _parent.ScaleY = 1f - _system.ScalePerDistance.Y * _distance;
+            ScaleFactor = new PointF(1f - _system.ScalePerDistance.X * _distance,
+                1f - _system.ScalePerDistance.Y * _distance);
+            _parent.ScaleX = ScaleFactor.X;
+            _parent.ScaleY = ScaleFactor.Y;
             _parent.RenderLayer = _renderLayer;
         }
 
@@ -46,12 +52,55 @@ namespace LayerGame
         {
             _objects.Add(o);
             _parent.TreeNode.AddChild(o);
-            updateObject(o);
+            foreach (IArea area in _areas)
+                area.AllowEntity(o);
+            o.RenderLayer = _renderLayer;
         }
 
-        private void updateObject(IObject o)
+        public void Detach(IObject o)
         {
-            o.RenderLayer = _renderLayer;
+            _objects.Remove(o);
+            _parent.TreeNode.RemoveChild(o);
+            foreach (IArea area in _areas)
+                area.DisallowEntity(o);
+            o.RenderLayer = null;
+        }
+
+        public void Attach(IArea a)
+        {
+            _areas.Add(a);
+            if (!a.HasComponent<IAreaRestriction>())
+                a.AddComponent<IAreaRestriction>().RestrictionType = RestrictionListType.WhiteList;
+            if (!a.HasComponent<ITranslateComponent>())
+                a.AddComponent<ITranslateComponent>();
+            if (!a.HasComponent<IRotateComponent>())
+                a.AddComponent<IRotateComponent>();
+            if (!a.HasComponent<IScaleComponent>())
+                a.AddComponent<IScaleComponent>();
+            // TODO: need a way to add area to object parent!!
+            // probably IObject should have not ObjectTree but EntityTree component??
+            foreach (IObject o in _objects)
+                a.AllowEntity(o);
+            foreach (WorldSpace s in _system.Spaces)
+                if (s != this)
+                    foreach (IObject o in s.Objects)
+                        a.DisallowEntity(o);
+            IZoomArea zoom = a.GetComponent<IZoomArea>();
+            if (zoom == null)
+                zoom = a.AddComponent<IZoomArea>();
+            zoom.ZoomCamera = true;
+            // TODO: this is not really ideal
+            zoom.MinZoom = 1 / ScaleFactor.X;
+            zoom.MaxZoom = 1 / ScaleFactor.X;
+            IScalingArea scaling = a.GetComponent<IScalingArea>();
+            if (scaling == null)
+                scaling = a.AddComponent<IScalingArea>();
+            // TODO: this ofcourse is not good
+            scaling.MinScaling = ScaleFactor.X;
+            scaling.MaxScaling = ScaleFactor.X;
+
+            if (a.Mask.DebugDraw != null)
+                Attach(a.Mask.DebugDraw);
         }
     }
 

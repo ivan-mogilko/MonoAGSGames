@@ -7,6 +7,7 @@ namespace LayerGame
     public class IslandsRoom : RoomScript
     {
         private const string ROOM_ID = "IslandsRoom";
+        private const bool DebugAreas = true;
         private IRenderLayer[] _backgroundLayers;
         private IRenderLayer[] _foregroundLayers;
         private RectangleF _roomBounds;
@@ -36,6 +37,24 @@ namespace LayerGame
             IObject o = await addObject(name, gfile, x, y);
             o.Pivot = new PointF(0.5f, 1f);
             return o;
+        }
+
+        protected IArea addIslandArea(IObject islandObj)
+        {
+            var f = _game.Factory;
+            IMask islandMask = f.Masks.Load(islandObj.ID + "mask", islandObj.Image.OriginalBitmap, false,
+                DebugAreas ? Colors.GreenYellow.WithAlpha(50) : (Color?)null);
+            IArea a = f.Room.GetArea(islandObj.ID + "area", islandMask);
+            ITranslateComponent t = a.AddComponent<ITranslateComponent>();
+            a.AddComponent<IRotateComponent>();
+            a.AddComponent<IScaleComponent>();
+            f.Room.CreateScaleArea(a, 1f, 1f);
+            f.Room.CreateZoomArea(a, 1f, 1f);
+            _room.Areas.Add(a);
+
+            t.X = -islandObj.Width / 2;
+            t.Y = -islandObj.Height;
+            return a;
         }
 
         protected override async Task<IRoom> loadAsync()
@@ -76,15 +95,18 @@ namespace LayerGame
             _wsystem.ScalePerDistance = new PointF(0.1f, 0.1f);
             _wsystem.PerspectiveShiftPerDistance = new PointF(0f, 15f);
             int wz = AGSLayers.Foreground.Z;
-            _spaceIsland1 = new WorldSpace("island1", _wsystem, 0f, wz);
+            _spaceIsland1 = new WorldSpace("island1", _wsystem, 0f, wz + 1);
             IObject island = await addIsland("island1", "island_plat1.png", islandPos.X, islandPos.Y);
             _spaceIsland1.Attach(island);
-            _spaceIsland2 = new WorldSpace("island2", _wsystem, 4f, wz + 1);
+            _spaceIsland1.Attach(addIslandArea(island));
+            _spaceIsland2 = new WorldSpace("island2", _wsystem, 4f, wz + 2);
             island = await addIsland("island2", "island_plat2.png", islandPos.X, islandPos.Y);
             _spaceIsland2.Attach(island);
-            _spaceIsland3 = new WorldSpace("island3", _wsystem, 8f, wz + 2);
+            _spaceIsland2.Attach(addIslandArea(island));
+            _spaceIsland3 = new WorldSpace("island3", _wsystem, 8f, wz + 3);
             island = await addIsland("island3", "island_plat3.png", islandPos.X, islandPos.Y);
             _spaceIsland3.Attach(island);
+            _spaceIsland3.Attach(addIslandArea(island));
             _wsystem.Spaces.Add(_spaceIsland1);
             _wsystem.Spaces.Add(_spaceIsland2);
             _wsystem.Spaces.Add(_spaceIsland3);
@@ -114,6 +136,9 @@ namespace LayerGame
         {
             if (num < 0 || num > _wsystem.Spaces.Count)
                 return;
+
+            if (_curIsland >= 0)
+                _wsystem.Spaces[_curIsland].Detach(o);
             o.AttachToWorld(_wsystem.Spaces[num]);
             o.Y = _islandWalklines[num];
             _curIsland = num;
