@@ -53,8 +53,8 @@ namespace LastAndFurious
             setScale(target, viewport, resetPosition);
 
             //todo: Allow control over which point in the target to follow
-            float targetX = target.X;//target.CenterPoint == null ? target.X : target.CenterPoint.X;
-            float targetY = target.Y;//target.CenterPoint == null ? target.Y : target.CenterPoint.Y;
+            float targetX = target.X;
+            float targetY = target.Y;
             float maxResolutionX = virtualResoution.Width / viewport.ScaleX;
             float maxResolutionY = virtualResoution.Height / viewport.ScaleY;
             targetX = getTargetPos(targetX, roomLimits.X, roomLimits.Width, maxResolutionX);
@@ -132,7 +132,7 @@ namespace LastAndFurious
 
         private float getTargetPos(float target, float minRoom, float maxRoom, float maxResolution)
         {
-            float value = target - maxResolution / 2;
+            float value = target;
             return clamp(value, minRoom, maxRoom, maxResolution);
         }
 

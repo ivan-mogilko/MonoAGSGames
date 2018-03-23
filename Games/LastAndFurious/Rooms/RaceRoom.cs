@@ -225,6 +225,7 @@ namespace LastAndFurious
             _tChangeAICamera = null;
             if (_viewMan != null)
                 _viewMan.ResetToSingleViewport();
+            _game.State.Viewport.Pivot = new PointF();
 
             if (_race != null)
                 _race.Clear();
@@ -263,6 +264,7 @@ namespace LastAndFurious
                 _tChangeAICamera = null;
             }
 
+            _viewMan.MainViewport.Pivot = new PointF(0.5f, 0.5f);
             _viewMan.MainCameraTarget = _race.Player.Car.O;
             Camera cam = _viewMan.MainCamera;
             cam.TargettingAcceleration = 0f;
@@ -275,17 +277,17 @@ namespace LastAndFurious
             bool lastSnap = false;
             if (_viewMan.ViewportCount < MAX_VIEWPORTS)
             {
-                _viewMan.AddViewport();
+                var view = _viewMan.AddViewport();
+                (view.Camera as Camera).TargettingAcceleration = 0.5f;
                 lastSnap = true;
             }
 
             for (int i = 0; i < _viewMan.ViewportCount; ++i)
             {
                 _viewMan.CameraTargets[i] = _race.Cars[MathUtils.Random().Next(0, _race.Cars.Count - 1)].O;
-                Camera cam = _viewMan.GetCamera(i);
-                cam.TargettingAcceleration = 0.5f;
                 if (snap || i == _viewMan.ViewportCount - 1 && lastSnap)
-                    cam.Snap();
+                    _viewMan.GetCamera(i).Snap();
+                _viewMan.GetViewport(i).TweenAngle((float)MathUtils.Random().NextDouble() * 360f, 2f);
             }
 
             if (_tChangeAICamera == null)

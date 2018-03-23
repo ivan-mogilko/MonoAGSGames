@@ -64,6 +64,7 @@ namespace LastAndFurious
         public IViewport AddViewport()
         {
             IViewport view = addView();
+            view.Pivot = new PointF(0.5f, 0.5f);
             _gs.SecondaryViewports.Add(view);
             positionViewports();
             MainViewport.DisplayListSettings.DisplayRoom = false;
