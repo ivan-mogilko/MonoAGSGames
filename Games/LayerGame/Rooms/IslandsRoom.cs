@@ -163,9 +163,10 @@ namespace LayerGame
 
         private void onKeyUp(KeyboardEventArgs args)
         {
-            if (args.Key == Key.ShiftLeft)
+            Key key = args.Key;
+            if (key == Key.ShiftLeft)
                 _game.State.Viewport.Camera.Target = getRobot;
-            if (!_game.Input.IsKeyDown(Key.LShift))
+            if (!_game.Input.IsKeyDown(Key.LShift) && (key == Key.Up || key == Key.Down))
             {
                 int num = _curIsland;
                 if (args.Key == Key.Up)
