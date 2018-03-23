@@ -13,7 +13,7 @@ namespace LayerGame
         public IGame Game { get => _game; }
         public IList<WorldSpace> Spaces { get => _spaces; }
 
-        public float Baseline { get; set; }
+        public PointF Baseline { get; set; }
 
         public PointF ScalePerDistance { get; set; }
         public PointF ParallaxPerDistance { get; set; }

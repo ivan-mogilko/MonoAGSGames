@@ -31,18 +31,19 @@ namespace LayerGame
             _id = id;
             _system = system;
             _distance = distance;
-            PointF parallax = new PointF(1f / (system.ParallaxPerDistance.X * distance),
-                1f / (system.ParallaxPerDistance.Y * distance));
+            PointF parallax = new PointF(1f / ((1f + system.ParallaxPerDistance.X) * distance),
+                1f / ((1f + system.ParallaxPerDistance.Y) * distance));
             if (!MathEx.ValidFloat(parallax.X) || !MathEx.ValidFloat(parallax.Y))
                 parallax = new PointF(1f, 1f);
             _renderLayer = new AGSRenderLayer(z, parallax);
 
             _parent = _system.Game.Factory.Object.GetObject($"worldspace.{system.ID}.{id}.parent");
-            _parent.X = _system.Game.Settings.VirtualResolution.Width / 2 * -(parallax.X - 1f) + _system.PerspectiveShiftPerDistance.X * _distance;
-            _parent.Y = _system.Baseline + _system.PerspectiveShiftPerDistance.Y * _distance;
+            // TODO: alright, I don't remember why I did this formula for parent.X...
+            _parent.X = _system.Baseline.X * -(parallax.X - 1f) + _system.PerspectiveShiftPerDistance.X * _distance;
+            _parent.Y = _system.Baseline.Y + _system.PerspectiveShiftPerDistance.Y * _distance;
             _parent.BaseSize = new SizeF(1f, 1f);
-            ScaleFactor = new PointF(1f - _system.ScalePerDistance.X * _distance,
-                1f - _system.ScalePerDistance.Y * _distance);
+            ScaleFactor = new PointF(1f / ((1f + _system.ScalePerDistance.X) * _distance),
+                1f / ((1f + _system.ScalePerDistance.Y) * _distance));
             _parent.ScaleX = ScaleFactor.X;
             _parent.ScaleY = ScaleFactor.Y;
             _parent.RenderLayer = _renderLayer;

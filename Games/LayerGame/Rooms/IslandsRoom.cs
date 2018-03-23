@@ -7,7 +7,7 @@ namespace LayerGame
     public class IslandsRoom : RoomScript
     {
         private const string ROOM_ID = "IslandsRoom";
-        private const bool DebugAreas = true;
+        private const bool DebugAreas = false;
         private IRenderLayer[] _backgroundLayers;
         private IRenderLayer[] _foregroundLayers;
         private RectangleF _roomBounds;
@@ -62,6 +62,9 @@ namespace LayerGame
             IGameFactory f = _game.Factory;
             _room = f.Room.GetRoom(ROOM_ID);
 
+            int rx = _game.Settings.VirtualResolution.Width;
+            int ry = _game.Settings.VirtualResolution.Height;
+
             PointF[] parallaxVals = new PointF[]
             {
                 new PointF(0f, 0f), new PointF(0.05f, 0.02f)
@@ -69,7 +72,7 @@ namespace LayerGame
 
             Point[] coordVals = new Point[]
             {
-                new Point(0, 0), new Point(0, 0)
+                new Point(0 - rx / 2, 0 - ry / 2), new Point(0 - 340, 0 - ry / 2)
             };
 
             _backgroundLayers = new IRenderLayer[2];
@@ -80,30 +83,27 @@ namespace LayerGame
                 o.RenderLayer = _backgroundLayers[i];
             }
 
-            int rx = _game.Settings.VirtualResolution.Width;
-            int ry = _game.Settings.VirtualResolution.Height;
-
             // TODO: use world spaces bounds
-            _roomBounds = new RectangleF(-rx, 0, rx * 3, 800f);
+            _roomBounds = new RectangleF(-rx, ry / 4, rx * 3, ry * 2);
             _room.RoomLimitsProvider = AGSRoomLimits.Custom(_roomBounds);
 
             Point islandPos = new Point(0, 0);
             // Creating world spaces (a number of islands on different layers of parallax)
             _wsystem = new WorldSystem("ws", _game);
-            _wsystem.Baseline = ry / 4;
-            _wsystem.ParallaxPerDistance = new PointF(1.4f, 1.1f);
-            _wsystem.ScalePerDistance = new PointF(0.1f, 0.1f);
-            _wsystem.PerspectiveShiftPerDistance = new PointF(0f, 15f);
+            _wsystem.Baseline = new PointF(0f, 0f /*ry / 4f*/);
+            _wsystem.ParallaxPerDistance = new PointF(0.1f, 0.1f);
+            _wsystem.ScalePerDistance = new PointF(0.2f, 0.2f);
+            _wsystem.PerspectiveShiftPerDistance = new PointF(0f, 0f);
             int wz = AGSLayers.Foreground.Z;
-            _spaceIsland1 = new WorldSpace("island1", _wsystem, 0f, wz + 1);
+            _spaceIsland1 = new WorldSpace("island1", _wsystem, 1f, wz + 1);
             IObject island = await addIsland("island1", "island_plat1.png", islandPos.X, islandPos.Y);
             _spaceIsland1.Attach(island);
             _spaceIsland1.Attach(addIslandArea(island));
-            _spaceIsland2 = new WorldSpace("island2", _wsystem, 4f, wz + 2);
+            _spaceIsland2 = new WorldSpace("island2", _wsystem, 2f, wz + 2);
             island = await addIsland("island2", "island_plat2.png", islandPos.X, islandPos.Y);
             _spaceIsland2.Attach(island);
             _spaceIsland2.Attach(addIslandArea(island));
-            _spaceIsland3 = new WorldSpace("island3", _wsystem, 8f, wz + 3);
+            _spaceIsland3 = new WorldSpace("island3", _wsystem, 4f, wz + 3);
             island = await addIsland("island3", "island_plat3.png", islandPos.X, islandPos.Y);
             _spaceIsland3.Attach(island);
             _spaceIsland3.Attach(addIslandArea(island));
@@ -120,6 +120,8 @@ namespace LayerGame
 
         protected override void onActivate()
         {
+            _game.State.Viewport.Pivot = new PointF(0.5f, 0.5f);
+            _game.State.Viewport.Camera = new Camera(80f, 30f, 4f);
             _game.State.Viewport.Camera.Target = getRobot;
             _game.Events.OnRepeatedlyExecute.Subscribe(onRepExec);
             _game.Input.KeyDown.Subscribe(onKeyDown);
@@ -128,8 +130,9 @@ namespace LayerGame
 
         protected override void onDeactivate()
         {
-            _game.State.Viewport.Camera.Target = null;
             _game.Events.OnRepeatedlyExecute.Unsubscribe(onRepExec);
+            _game.State.Viewport.Pivot = new PointF();
+            _game.State.Viewport.Camera = new AGSCamera();
         }
 
         private void jumpToIsland(IObject o, int num)

@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rooms\ParallaxRoom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rooms\RoomScript.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\AreaHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\Camera.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\MathEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WorldSpace.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WorldSystem.cs" />
