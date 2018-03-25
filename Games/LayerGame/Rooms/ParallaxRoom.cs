@@ -70,6 +70,7 @@ namespace LayerGame
 
         protected override void onDeactivate()
         {
+            base.onDeactivate();
             _game.Events.OnRepeatedlyExecute.Unsubscribe(onRepExec);
         }
 

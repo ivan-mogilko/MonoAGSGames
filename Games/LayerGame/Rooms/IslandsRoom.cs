@@ -130,8 +130,8 @@ namespace LayerGame
 
         protected override void onDeactivate()
         {
+            base.onDeactivate();
             _game.Events.OnRepeatedlyExecute.Unsubscribe(onRepExec);
-            _game.State.Viewport.Pivot = new PointF();
             _game.State.Viewport.Camera = new AGSCamera();
         }
 

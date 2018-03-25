@@ -39,7 +39,13 @@ namespace LayerGame
 
         protected virtual async Task<IRoom> loadAsync() { return null; }
         protected virtual void onActivate() { }
-        protected virtual void onDeactivate() { }
+        protected virtual void onDeactivate()
+        {
+            _game.State.Viewport.Pivot = new PointF();
+            _game.State.Viewport.ScaleX = 1f;
+            _game.State.Viewport.ScaleY = 1f;
+            _game.State.Viewport.Angle = 0f;
+        }
 
         protected IObject getObject(string name, IImage image, int x = 0, int y = 0)
         {
