@@ -91,19 +91,19 @@ namespace LayerGame
             // Creating world spaces (a number of islands on different layers of parallax)
             _wsystem = new WorldSystem("ws", _game);
             _wsystem.Baseline = new PointF(0f, 0f /*ry / 4f*/);
-            _wsystem.ParallaxPerDistance = new PointF(0.1f, 0.1f);
-            _wsystem.ScalePerDistance = new PointF(0.2f, 0.2f);
+            _wsystem.ParallaxPerDistance = new PointF(1f, 1f);
+            _wsystem.ScalePerDistance = new PointF(1f, 1f);
             _wsystem.PerspectiveShiftPerDistance = new PointF(0f, 0f);
             int wz = AGSLayers.Foreground.Z;
-            _spaceIsland1 = new WorldSpace("island1", _wsystem, 1f, wz + 1);
+            _spaceIsland1 = new WorldSpace("island1", _wsystem, 0.2f, wz + 1);
             IObject island = await addIsland("island1", "island_plat1.png", islandPos.X, islandPos.Y);
             _spaceIsland1.Attach(island);
             _spaceIsland1.Attach(addIslandArea(island));
-            _spaceIsland2 = new WorldSpace("island2", _wsystem, 2f, wz + 2);
+            _spaceIsland2 = new WorldSpace("island2", _wsystem, 1.2f, wz + 2);
             island = await addIsland("island2", "island_plat2.png", islandPos.X, islandPos.Y);
             _spaceIsland2.Attach(island);
             _spaceIsland2.Attach(addIslandArea(island));
-            _spaceIsland3 = new WorldSpace("island3", _wsystem, 4f, wz + 3);
+            _spaceIsland3 = new WorldSpace("island3", _wsystem, 2.8f, wz + 3);
             island = await addIsland("island3", "island_plat3.png", islandPos.X, islandPos.Y);
             _spaceIsland3.Attach(island);
             _spaceIsland3.Attach(addIslandArea(island));

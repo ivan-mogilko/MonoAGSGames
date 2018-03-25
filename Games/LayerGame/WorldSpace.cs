@@ -31,8 +31,9 @@ namespace LayerGame
             _id = id;
             _system = system;
             _distance = distance;
-            PointF parallax = new PointF(1f / ((1f + system.ParallaxPerDistance.X) * distance),
-                1f / ((1f + system.ParallaxPerDistance.Y) * distance));
+            // TODO: use some real world optics math here!
+            PointF parallax = new PointF(1f / (1f + system.ParallaxPerDistance.X * distance),
+                1f / (1f + system.ParallaxPerDistance.Y * distance));
             if (!MathEx.ValidFloat(parallax.X) || !MathEx.ValidFloat(parallax.Y))
                 parallax = new PointF(1f, 1f);
             _renderLayer = new AGSRenderLayer(z, parallax);
@@ -42,8 +43,8 @@ namespace LayerGame
             _parent.X = _system.Baseline.X * -(parallax.X - 1f) + _system.PerspectiveShiftPerDistance.X * _distance;
             _parent.Y = _system.Baseline.Y + _system.PerspectiveShiftPerDistance.Y * _distance;
             _parent.BaseSize = new SizeF(1f, 1f);
-            ScaleFactor = new PointF(1f / ((1f + _system.ScalePerDistance.X) * _distance),
-                1f / ((1f + _system.ScalePerDistance.Y) * _distance));
+            ScaleFactor = new PointF(1f / (1f + _system.ScalePerDistance.X * _distance),
+                1f / (1f + _system.ScalePerDistance.Y * _distance));
             _parent.ScaleX = ScaleFactor.X;
             _parent.ScaleY = ScaleFactor.Y;
             _parent.RenderLayer = _renderLayer;
