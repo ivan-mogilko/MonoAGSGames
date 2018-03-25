@@ -18,6 +18,7 @@ namespace LayerGame
         public PointF ScalePerDistance { get; set; }
         public PointF ParallaxPerDistance { get; set; }
         public PointF PerspectiveShiftPerDistance { get; set; }
+        public float SaturationLossPerDistance { get; set; }
 
         public WorldSystem(string id, IGame game)
         {

@@ -57,6 +57,8 @@ namespace LayerGame
             foreach (IArea area in _areas)
                 area.AllowEntity(o);
             o.RenderLayer = _renderLayer;
+            var sat = o.AddComponent<ISaturationEffectComponent>();
+            sat.Saturation = 1f / (1f + _system.SaturationLossPerDistance * _distance);
         }
 
         public void Detach(IObject o)
@@ -66,6 +68,10 @@ namespace LayerGame
             foreach (IArea area in _areas)
                 area.DisallowEntity(o);
             o.RenderLayer = null;
+            // TODO: remember which one did not have it and remove one?
+            var sat = o.GetComponent<ISaturationEffectComponent>();
+            if (sat != null)
+                sat.Saturation = 1f;
         }
 
         public void Attach(IArea a)

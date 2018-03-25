@@ -88,12 +88,14 @@ namespace LayerGame
             _room.RoomLimitsProvider = AGSRoomLimits.Custom(_roomBounds);
 
             Point islandPos = new Point(0, 0);
+            _curIsland = -1;
             // Creating world spaces (a number of islands on different layers of parallax)
             _wsystem = new WorldSystem("ws", _game);
             _wsystem.Baseline = new PointF(0f, 0f /*ry / 4f*/);
             _wsystem.ParallaxPerDistance = new PointF(1f, 1f);
             _wsystem.ScalePerDistance = new PointF(1f, 1f);
             _wsystem.PerspectiveShiftPerDistance = new PointF(0f, 0f);
+            _wsystem.SaturationLossPerDistance = 0.1f;
             int wz = AGSLayers.Foreground.Z;
             _spaceIsland1 = new WorldSpace("island1", _wsystem, 0.2f, wz + 1);
             IObject island = await addIsland("island1", "island_plat1.png", islandPos.X, islandPos.Y);
